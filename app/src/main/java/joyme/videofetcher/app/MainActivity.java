@@ -1,7 +1,6 @@
 package joyme.videofetcher.app;
 
 import android.app.Activity;
-import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.net.http.SslError;
 import android.os.AsyncTask;
@@ -46,11 +45,11 @@ public class MainActivity extends Activity {
         rootview = ((ViewGroup) this.findViewById(android.R.id.content)).getChildAt(0);
 
         mSelf = this;
+        mTimer = new Timer();
         mWebview = (WebView) findViewById(R.id.main_webview);
         mButton = (Button) findViewById(R.id.main_btn);
 
-//        rootview.setVisibility(View.INVISIBLE);
-//        mWebview.setVisibility(View.INVISIBLE);
+        mButton.setVisibility(View.GONE);
         mWebview.getSettings().setJavaScriptEnabled(true);
         mWebview.getSettings().setUserAgentString("Mozilla/5.0 (iPad; CPU OS 7_0 like Mac OS X) AppleWebKit/537.51.1 (KHTML, like Gecko) Version/7.0 Mobile/11A465 Safari/9537.53");
         mWebview.addJavascriptInterface(new HtmlLoader(), "loader");
@@ -59,8 +58,6 @@ public class MainActivity extends Activity {
             @Override
             public void onPageFinished(WebView view, String url) {
                 mWebview.loadUrl("javascript:window.loader.loadHtml('<html>'+document.getElementsByTagName('html')[0].innerHTML+'</html>');");
-//                super.onPageFinished(view, url);
-                Toast.makeText(mSelf, "Finished", Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -72,19 +69,14 @@ public class MainActivity extends Activity {
             @Override
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
                 super.onPageStarted(view, url, favicon);
-//                mWebview.loadUrl("javascript:window.loader.loadHtml('<html>'+document.getElementsByTagName('html')[0].innerHTML+'</html>');");
             }
         });
 
-//        mWebview.loadUrl(mUrl);
-        new UrlCatcher().execute();
+        mWebview.loadUrl(mUrl);
 
         mButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                mWebview.loadUrl("javascript:window.loader.loadHtml('<html>'+document.getElementsByTagName('html')[0].innerHTML+'</html>');");
-//                mWebview.reload();
-                new UrlCatcher().execute();
             }
         });
 
@@ -106,87 +98,30 @@ public class MainActivity extends Activity {
             public void run() {
                 Message msg = new Message();
                 msg.what = 1;
+                System.out.println("====== sending msg======");
                 mHandler.sendMessage(msg);
             }
         };
-    }
-
-    private void changeWebviewOrientation() {
-        out.println("================== " + Thread.currentThread().getStackTrace()[2].getClassName() + " ===============");
-        out.println("Changing orientation " + this.getRequestedOrientation());
-
-
-        if (this.getRequestedOrientation() == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE) {
-            this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-            out.println("=============Change to portrait==========");
-        } else if (this.getRequestedOrientation() == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT) {
-            this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-            out.println("=============Change to landscapte==========");
-        }
-
-        count++;
     }
 
     class HtmlLoader {
         @JavascriptInterface
         public void loadHtml(final String str) {
             mHtmlText = str;
-//            out.print("str is " + mHtmlText);
+            out.print("str is " + mHtmlText);
 
-//            System.out.println("Calling loadhtml");
-
-//            if (str.contains("sig")) {
-//                out.println("================== " + Thread.currentThread().getStackTrace()[2].getClassName() + " ===============");
-//                out.println("^^^^^^^^^^^^^ got it! " + count);
-////                mSelf.getWindow().getDecorView().setVisibility(View.VISIBLE);
-////                rootview.setVisibility(View.VISIBLE);
-////                rootview.invalidate();
-//
-//            } else {
-////                out.println("================== " + Thread.currentThread().getStackTrace()[2].getClassName() + " ===============");
-////                out.println("changing orientation");
-////
-////                mSelf.changeWebviewOrientation();
-////                mButton.callOnClick();
-////                new AsyncTask<Void, Void, Void>() {
-////
-////                    @Override
-////                    protected Void doInBackground(Void... voids) {
-////                        mSelf.changeWebviewOrientation();
-////                        return null;
-////                    }
-////
-////                    @Override
-////                    protected void onPostExecute(Void aVoid) {
-////                        if (str.contains("sid")) {
-////                            return;
-////                        }
-////
-////
-////                    }
-////                }.execute();
-//                out.println("loading async task ");
-////                mWebview.loadUrl(mUrl);
-////                mWebview.reload();
-//                count++;
-////                new UrlCatcher().execute();
-//            }
-
-            if (mHtmlText.contains("key=")) {
-                flag = true;
-                out.println("-------------- count is  " + count);
+            if (mHtmlText.contains("sig")) {
+                Toast.makeText(mSelf, "Params captured in " + count + " loading times", Toast.LENGTH_LONG).show();
+                mTimer.cancel();
             } else {
+                mTimer.schedule(mTimertask, 3000);
                 count++;
                 mWebview.loadUrl(mUrl);
-                mTimer.schedule(mTimertask, 500);
-                out.println("timer start");
-
             }
 
             if (flag) {
                 return;
             }
-//            new UrlCatcher().execute();
         }
     }
 
@@ -194,30 +129,17 @@ public class MainActivity extends Activity {
 
         @Override
         protected Void doInBackground(Void... voids) {
-            out.println("loading html ");
-
-//            mSelf.changeWebviewOrientation();
-//            mWebview.reload();
-//            reloadWebview();
             mWebview.loadUrl(mUrl);
-//            mButton.callOnClick();
 
             return null;
         }
 
         @Override
         protected void onPostExecute(Void aVoid) {
-//            mButton.callOnClick();
-            out.println("Task finished");
-            Toast.makeText(mSelf, "Task finished", Toast.LENGTH_SHORT).show();
-
             if (mHtmlText.contains("sig")) {
-                out.println("================== " + Thread.currentThread().getStackTrace()[2].getClassName() + " ===============");
-                out.println("^^^^^^^^^^^^^ got it! " + count);
                 flag = true;
             } else {
                 count++;
-//                new UrlCatcher().execute();
             }
         }
     }
