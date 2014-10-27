@@ -3,7 +3,6 @@ package joyme.videofetcher.app;
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.net.http.SslError;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -121,25 +120,6 @@ public class MainActivity extends Activity {
 
             if (flag) {
                 return;
-            }
-        }
-    }
-
-    class UrlCatcher extends AsyncTask<Void, Void, Void> {
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-            mWebview.loadUrl(mUrl);
-
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            if (mHtmlText.contains("sig")) {
-                flag = true;
-            } else {
-                count++;
             }
         }
     }
