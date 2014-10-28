@@ -22,15 +22,17 @@ import static java.lang.System.out;
 
 public class MainActivity extends Activity {
 
-    private final int HTML_LOADED = 0;
-    private final int JS_GENERATED = 1;
-    private final int JS_LOADED = 2;
-    private int mCurrentStage = HTML_LOADED;
+    private final int SOHU_HTML_LOADED = 0;
+    private final int SOHU_JS_GENERATED = 1;
+    private final int SOHU_JSON_LOADED = 2;
+    private final int SOHU_JSON_PARSED = 3;
+    private final int SOHU_M3U8_PARSED = 4;
+    private int mCurrentStage = SOHU_HTML_LOADED;
     private WebView mWebview;
     private Button mButton;
-//    private String mUrl = "http://hot.vrs.sohu.com/ipad1006750_4625602509181_4217071.m3u8?plat=h5";
-        private String mUrl = "http://pad.tv.sohu.com/20130415/n372763498.shtml";
-//    private String mLexTvUrl = "http://m.letv.com/ptv/vplay/21036600.html";
+    //    private String mUrl = "http://hot.vrs.sohu.com/ipad1006750_4625602509181_4217071.m3u8?plat=h5";
+    private String mUrl = "http://pad.tv.sohu.com/20130415/n372763498.shtml";
+    private String mLexTvUrl = "http://m.letv.com/ptv/vplay/21036600.html";
     protected String mHtmlText = "";
     protected MainActivity mSelf;
     private int count = 0;
@@ -46,7 +48,7 @@ public class MainActivity extends Activity {
 
     private final static String JS_FUNC = "myFunction();";
 
-    //    private final static String LEXTV_JSFUNC = "$('#j-player').trigger('click')";
+    private final static String LEXTV_JSFUNC = "$('#j-player').trigger('click')";
 //    private final static String LEXTV_JSFUNC = "javascript:$('.hv_ico_pasued').trigger('click')";
 
 
@@ -74,8 +76,21 @@ public class MainActivity extends Activity {
             @Override
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
-                mMsg.what = mCurrentStage;
-                mHandler.sendMessage(mMsg);
+                Message msg = new Message();
+                msg.what = mCurrentStage;
+                mHandler.sendMessage(msg);
+//                mTimer.schedule(mTimertask, 3000);
+//                if (mTimertask == null || mTimertask.cancel()){
+//                    mTimertask = new TimerTask() {
+//                        @Override
+//                        public void run() {
+//                            mMsg.what = mCurrentStage;
+//                            mHandler.sendMessage(mMsg);
+//                        }
+//                    };
+//                }
+//
+//                mTimer.schedule(mTimertask, 3000);
             }
 
             @Override
@@ -86,46 +101,58 @@ public class MainActivity extends Activity {
         });
 
         mWebview.loadUrl(mUrl);
+//           mWebview.loadUrl();
 
         mHandler = new Handler() {
             @Override
             public void handleMessage(Message msg) {
 
                 switch (msg.what) {
-                    case HTML_LOADED:
+                    case SOHU_HTML_LOADED:
                         mWebview.loadUrl("javascript:" + FUNC);
-                        out.println("==========    " + "stage one " + "   ===========");
+                        out.println("==========    " + "loading original html " + "   ===========");
+                        mCurrentStage++;
                         break;
 
-                    case JS_GENERATED:
+                    case SOHU_JS_GENERATED:
                         mWebview.loadUrl("javascript:myFunction();");
 //                        mWebview.loadUrl("javascript:window.loader.loadHtml('<html>'+document.getElementsByTagName('html')[0].innerHTML+'</html>');");
-                        out.println("==========    " + " stage two" + "   ===========");
+                        out.println("==========    " + " js generated" + "   ===========");
+                        mCurrentStage++;
                         break;
 
-                    case JS_LOADED:
+                    case SOHU_JSON_LOADED:
+                        mCurrentStage++;
+                        mWebview.loadUrl("javascript:" + FUNC);
+                        out.println("==========    " + "tags generated and redirect to json1 file " + "   ===========");
+                        break;
+
+                    case SOHU_JSON_PARSED:
+                        mWebview.loadUrl("javascript:myFunction();");
+                        out.println("==========    " + "js generated and replace tabs " + "   ===========");
+                        mCurrentStage++;
+                        break;
+
+                    case SOHU_M3U8_PARSED:
                         mWebview.loadUrl("javascript:window.loader.loadHtml('<html>'+document.getElementsByTagName('html')[0].innerHTML+'</html>');");
-                        out.println("==========    " + "stage three " + "   ===========");
+                        out.println("==========    " + "complete re-organize url  " + "   ===========");
+                        out.println("==========    " + " url is " + mWebview.getUrl() + "   ===========");
+
+                        mCurrentStage++;
                         break;
                 }
 
-                mCurrentStage++;
+//                mCurrentStage++;
 
-                if (mTimertask == null || mTimertask.cancel()) {
-                    mTimertask = new TimerTask() {
-                        @Override
-                        public void run() {
-                            mMsg = new Message();
-                            mMsg.what = mCurrentStage;
-                            mHandler.sendMessage(mMsg);
-                        }
-                    };
-                    mTimer.schedule(mTimertask, 3000);
-                } else {
-                    out.println("==========    " + " timertaske cancelled failed " + "   ===========");
-                }
-
-                out.println("==========    " + mCurrentStage + "   ===========");
+                mTimertask = new TimerTask() {
+                    @Override
+                    public void run() {
+                        mMsg = new Message();
+                        mMsg.what = mCurrentStage;
+                        mHandler.sendMessage(mMsg);
+                    }
+                };
+                mTimer.schedule(mTimertask, 3000);
             }
         };
     }
