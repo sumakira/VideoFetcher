@@ -64,11 +64,6 @@ public class MainActivity extends Activity {
                 super.onReceivedSslError(view, handler, error);
                 handler.proceed();
             }
-
-            @Override
-            public void onPageStarted(WebView view, String url, Bitmap favicon) {
-                super.onPageStarted(view, url, favicon);
-            }
         });
 
         mWebview.loadUrl(mUrl);
@@ -85,7 +80,7 @@ public class MainActivity extends Activity {
                 switch (msg.what) {
                     case 1:
                         out.println("checking html determined by timer");
-
+//                        mWebview.loadUrl(mUrl);
                         mWebview.loadUrl("javascript:window.loader.loadHtml('<html>'+document.getElementsByTagName('html')[0].innerHTML+'</html>');");
                         break;
                 }
@@ -97,7 +92,7 @@ public class MainActivity extends Activity {
             public void run() {
                 Message msg = new Message();
                 msg.what = 1;
-                System.out.println("====== sending msg======");
+                out.println("====== sending msg======");
                 mHandler.sendMessage(msg);
             }
         };
@@ -111,11 +106,18 @@ public class MainActivity extends Activity {
 
             if (mHtmlText.contains("sig")) {
                 Toast.makeText(mSelf, "Params captured in " + count + " loading times", Toast.LENGTH_LONG).show();
+                out.println("================== " + Thread.currentThread().getStackTrace()[2].getClassName() + " ===============");
+                out.println(" Params captured in " + count + " loading times");
+
                 mTimer.cancel();
             } else {
-                mTimer.schedule(mTimertask, 3000);
-                count++;
+                out.println("================== " + Thread.currentThread().getStackTrace()[2].getClassName() + " ===========load again ====");
+                out.println("");
                 mWebview.loadUrl(mUrl);
+                mTimer.schedule(mTimertask, 1000);
+                count++;
+
+//                mWebview.reload();
             }
 
             if (flag) {
