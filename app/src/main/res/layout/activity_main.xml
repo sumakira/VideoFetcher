@@ -15,6 +15,7 @@
         android:id="@+id/main_webview"
         android:layout_width="match_parent"
         android:layout_below="@+id/main_btn"
+        android:visibility="gone"
         android:layout_height="match_parent" />
 
 </RelativeLayout>
