@@ -2,6 +2,7 @@ package joyme.videofetcher.app;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.media.AudioManager;
 import android.net.http.SslError;
 import android.os.Build;
 import android.os.Bundle;
@@ -11,6 +12,11 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.webkit.*;
 import android.widget.Button;
+import android.widget.ProgressBar;
+import android.widget.TextView;
+import io.vov.vitamio.LibsChecker;
+import io.vov.vitamio.widget.MediaController;
+import io.vov.vitamio.widget.VideoView;
 
 public class MainActivity extends Activity {
 
@@ -20,6 +26,13 @@ public class MainActivity extends Activity {
 
     private WebView mWebview;
     private Button mButton;
+    private VideoView mVideoView;
+    private ProgressBar mProgressbar;
+    private TextView mTvDownloadRate, mTvLoadRate;
+    private MediaController mMediaController;
+    private AudioManager mAudioManager;
+
+
     private String mUrl = "http://pad.tv.sohu.com/20130415/n372764577.shtml";
     private String mLexTvUrl = "http://m.letv.com/ptv/vplay/21036600.html";
     private String mYoukuUrl = "http://v.youku.com/v_show/id_XODEzNzgyMTY0.html?f=22987453&ev=1&from=y8.3-idx-grid-1519-9909.86808-86807.1-1";
@@ -41,7 +54,13 @@ public class MainActivity extends Activity {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_main);
+
+        if (!LibsChecker.checkVitamioLibs(this)) {
+            return;
+        }
+
         rootview = ((ViewGroup) this.findViewById(android.R.id.content)).getChildAt(0);
+        mVideoView = (VideoView) findViewById(R.id.main_videoview);
 
         mUrl = mYoukuUrl;
 //        mUrl = mLexTvUrl;
