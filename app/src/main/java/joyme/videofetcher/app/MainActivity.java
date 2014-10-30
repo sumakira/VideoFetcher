@@ -49,10 +49,6 @@ public class MainActivity extends Activity implements PatternMatch.PlayVideoInte
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
-//        if (!LibsChecker.checkVitamioLibs(this)) {
-//            return;
-//        }
-
         setContentView(R.layout.activity_main);
         rootview = ((ViewGroup) this.findViewById(android.R.id.content)).getChildAt(0);
 
@@ -64,18 +60,7 @@ public class MainActivity extends Activity implements PatternMatch.PlayVideoInte
 
         mWebview = (WebView) findViewById(R.id.main_webview);
         mButton = (Button) findViewById(R.id.main_btn);
-//        mVideoView = (VideoView) findViewById(R.id.main_videoview);
-//        mMediaController = new MediaController(this);
-//        mProgressbar = (ProgressBar) findViewById(R.id.main_pb);
-//        mTvDownloadRate = (TextView) findViewById(R.id.main_tv_downloadRate);
-//        mTvLoadRate = (TextView) findViewById(R.id.main_tv_loadRate);
         mButton.setVisibility(View.GONE);
-
-//        mVideoView.setMediaController(mMediaController);
-//        mVideoView.requestFocus();
-//        mVideoView.setOnInfoListener(this);
-//        mVideoView.setOnBufferingUpdateListener(this);
-//        mVideoView.setOnPreparedListener(this);
 
         mWebview.getSettings().setJavaScriptEnabled(true);
 
