@@ -1,18 +1,20 @@
 package joyme.videofetcher.app;
 
-import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.Intent;
 import android.net.http.SslError;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
-import android.webkit.*;
+import android.webkit.JavascriptInterface;
+import android.webkit.SslErrorHandler;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.Button;
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements PatternMatch.PlayVideoInterface {
 
     private final int SOHU = 0x01;
     private final int YOUKU = 0x02;
@@ -20,6 +22,12 @@ public class MainActivity extends Activity {
 
     private WebView mWebview;
     private Button mButton;
+//    private VideoView mVideoView;
+//    private ProgressBar mProgressbar;
+//    private TextView mTvDownloadRate, mTvLoadRate;
+//    private MediaController mMediaController;
+//    private AudioManager mAudioManager;
+
     private String mUrl = "http://pad.tv.sohu.com/20130415/n372764577.shtml";
     private String mLexTvUrl = "http://m.letv.com/ptv/vplay/21036600.html";
     private String mYoukuUrl = "http://v.youku.com/v_show/id_XODEzNzgyMTY0.html?f=22987453&ev=1&from=y8.3-idx-grid-1519-9909.86808-86807.1-1";
@@ -39,19 +47,36 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+//        if (!LibsChecker.checkVitamioLibs(this)) {
+//            return;
+//        }
+
         setContentView(R.layout.activity_main);
         rootview = ((ViewGroup) this.findViewById(android.R.id.content)).getChildAt(0);
 
-        mUrl = mYoukuUrl;
+        //switch video sources between youku and sohu
+//        mUrl = mYoukuUrl;
 //        mUrl = mLexTvUrl;
 
         mSelf = this;
 
         mWebview = (WebView) findViewById(R.id.main_webview);
         mButton = (Button) findViewById(R.id.main_btn);
-
+//        mVideoView = (VideoView) findViewById(R.id.main_videoview);
+//        mMediaController = new MediaController(this);
+//        mProgressbar = (ProgressBar) findViewById(R.id.main_pb);
+//        mTvDownloadRate = (TextView) findViewById(R.id.main_tv_downloadRate);
+//        mTvLoadRate = (TextView) findViewById(R.id.main_tv_loadRate);
         mButton.setVisibility(View.GONE);
+
+//        mVideoView.setMediaController(mMediaController);
+//        mVideoView.requestFocus();
+//        mVideoView.setOnInfoListener(this);
+//        mVideoView.setOnBufferingUpdateListener(this);
+//        mVideoView.setOnPreparedListener(this);
+
         mWebview.getSettings().setJavaScriptEnabled(true);
 
         if (videoUrlIsFrom(mUrl) == SOHU) {
@@ -94,6 +119,60 @@ public class MainActivity extends Activity {
         });
 
         mWebview.loadUrl(mUrl);
+
+        PatternMatch.setDelegate(this);
+    }
+
+//    @Override
+//    public void onBufferingUpdate(MediaPlayer mp, int percent) {
+//        mTvLoadRate.setText(percent + "%");
+//    }
+
+//    @Override
+//    public void onClick(View view) {
+//
+//    }
+
+//    @Override
+//    public boolean onInfo(MediaPlayer mp, int what, int extra) {
+//        switch (what) {
+//            case MediaPlayer.MEDIA_INFO_BUFFERING_START:
+//                if (mVideoView.isPlaying()) {
+//                    mVideoView.pause();
+//                    mProgressbar.setVisibility(View.VISIBLE);
+//                    mTvDownloadRate.setVisibility(View.VISIBLE);
+//                    mTvDownloadRate.setText("");
+//                    mTvLoadRate.setVisibility(View.VISIBLE);
+//                    mTvLoadRate.setText("");
+//                }
+//                break;
+//
+//            case MediaPlayer.MEDIA_INFO_DOWNLOAD_RATE_CHANGED:
+//                mTvDownloadRate.setText("" + extra + "kb/s" + " ");
+//                break;
+//
+//            case MediaPlayer.MEDIA_INFO_BUFFERING_END:
+//                mVideoView.start();
+//                mProgressbar.setVisibility(View.GONE);
+//                mTvDownloadRate.setVisibility(View.GONE);
+//                mTvLoadRate.setVisibility(View.GONE);
+////                mMaxVideoLength = mVideoView.getDuration();
+//                break;
+//        }
+//        return false;
+//    }
+
+//    @Override
+//    public void onPrepared(MediaPlayer mp) {
+//        mp.setPlaybackSpeed(1.0f);
+//    }
+
+    @Override
+    public void playVideo(String url) {
+        System.out.println("start to load the video");
+        Intent intent = new Intent(this, VideoPlayActivity.class);
+        intent.putExtra("url",url);
+        this.startActivity(intent);
     }
 
     class HtmlLoader {
@@ -114,4 +193,6 @@ public class MainActivity extends Activity {
         }
         return 0;
     }
+
+
 }

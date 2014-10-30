@@ -1,1 +1,5 @@
 include ':app'
+
+include ':vitamio'
+project(':vitamio').projectDir = new File('/Users/TianZhang/Documents/Joyme/Projects/Android/Libs/VitamioBundle-master 2/vitamio')
+
